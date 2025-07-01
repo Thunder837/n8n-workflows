@@ -1,0 +1,127 @@
+{
+  "workflow": {
+    "name": "Telegram - Добавление подрядчика (Шаг 1)",
+    "nodes": [
+      {
+        "parameters": {
+          "updates": "message",
+          "updateTypes": ["message", "callback_query"]
+        },
+        "name": "Telegram Trigger",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1,
+        "position": [-600, 0],
+        "credentials": {}
+      },
+      {
+        "parameters": {
+          "rules": [
+            {
+              "conditions": {
+                "string": {
+                  "value1": "={{$json.message.text}}",
+                  "operation": "contains",
+                  "value2": "/start"
+                }
+              }
+            },
+            {
+              "conditions": {
+                "string": {
+                  "value1": "={{$json.message.text}}",
+                  "operation": "equal",
+                  "value2": "Добавить подрядчика"
+                }
+              }
+            }
+          ]
+        },
+        "name": "Router",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 1,
+        "position": [-400, 0]
+      },
+      {
+        "parameters": {
+          "chatId": "={{$json.message.chat.id}}",
+          "text": "👋 Добро пожаловать!\n\nНажмите кнопку ниже, чтобы добавить подрядчика.",
+          "additionalFields": {
+            "replyMarkup": "{\"keyboard\":[[{\"text\":\"Добавить подрядчика\"}]],\"resize_keyboard\":true,\"one_time_keyboard\":false}"
+          }
+        },
+        "name": "/start → Главное меню",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1,
+        "position": [-200, -100],
+        "credentials": {}
+      },
+      {
+        "parameters": {
+          "chatId": "={{$json.message.chat.id}}",
+          "text": "✏️ Пожалуйста, отправьте информацию о подрядчике (текстом или ссылкой на сайт)."
+        },
+        "name": "Добавить подрядчика → Запрос",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1,
+        "position": [-200, 0],
+        "credentials": {}
+      },
+      {
+        "parameters": {
+          "chatId": "={{$json.message.chat.id}}",
+          "text": "🤖 Спасибо! Обрабатываю ваши данные..."
+        },
+        "name": "Данные на парсинг",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1,
+        "position": [-200, 100],
+        "credentials": {}
+      }
+    ],
+    "connections": {
+      "Telegram Trigger": {
+        "main": [
+          [
+            {
+              "node": "Router",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Router": {
+        "main": [
+          [
+            {
+              "node": "/start → Главное меню",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Добавить подрядчика → Запрос",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Данные на парсинг",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {},
+    "tags": [],
+    "versionId": "1",
+    "meta": {
+      "instanceId": "generated-instance-id"
+    }
+  }
+}
